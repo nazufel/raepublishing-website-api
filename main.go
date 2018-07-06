@@ -1,22 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/nazufel/raepublishing-website-api/controllers"
 )
 
 func main() {
 	// Init router
 	r := httprouter.New()
 
+	// Init UserController
+	uc := controllers.NewUserController()
 	// Add handler on /test
-	r.GET("/test", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		// Simply write some test data for now
-		fmt.Fprint(w, "Welcome!\n")
-	})
-
+	r.GET("/user/:id", uc.GetUser)
+	r.POST("/user/", uc.CreateUser)
+	r.DELETE("/user/:id", uc.DeleteUser)
 	// Start the server
-	http.ListenAndServe("localhost:8080", r)
+	http.ListenAndServe("localhost:3000", r)
 }
