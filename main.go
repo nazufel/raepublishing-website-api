@@ -21,12 +21,16 @@ func getSession() *mgo.Session {
 
 func main() {
 	// Init router
+	/* TODO: Evaluate whether to continue using the julienschmidt router or Gorilla Mux.
+	+ Gorilla Mux does allow multiple methods per route. It could be nice to have POST and PUT
+	+ for create and update users*/
 	r := httprouter.New()
 
 	// Init UserController
 	uc := controllers.NewUserController(getSession())
 	// User Controllers
 	r.GET("/users/:id", uc.GetUser)
+	r.GET("/users/", uc.GetAllUsers)
 	r.POST("/users/", uc.CreateUser)
 	r.PUT("/users/", uc.CreateUser)
 	r.DELETE("/users/:id", uc.DeleteUser)

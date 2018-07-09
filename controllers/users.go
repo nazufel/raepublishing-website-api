@@ -50,6 +50,7 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 	fmt.Fprintf(w, "%s", uj)
 }
 
+// READ: GET //
 //GetUser retrieves an individual user resource
 func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// Grab id
@@ -80,6 +81,26 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK) // 200
+	fmt.Fprintf(w, "%s\n", uj)
+}
+
+func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	u := models.User{}
+
+	// Fetch users
+	if err := uc.session.DB("go_rest_tutorial").C("users").Find(&u); err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	uj, err := json.Marshal(u)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(models.User{})
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
