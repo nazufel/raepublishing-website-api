@@ -23,6 +23,33 @@ func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }
 
+// CRUD HANDLERS //
+
+// CREATE: POST, PUT
+//CreateUser Controller for creating a new user
+func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// Stub a user to be populated from the body
+	u := models.User{}
+
+	// Populate the user data
+	json.NewDecoder(r.Body).Decode(&u)
+
+	// Add an Id
+	u.ID = bson.NewObjectId()
+
+	// Write the user to mongo
+	uc.session.DB("go_rest_tutorial").C("users").Insert(u)
+
+	// Marshal provided interface into JSON structure
+	//TODO: understand Marshal
+	uj, _ := json.Marshal(u)
+
+	// Write content-type, statuscode, payload
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated) //201
+	fmt.Fprintf(w, "%s", uj)
+}
+
 //GetUser retrieves an individual user resource
 func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// Grab id
@@ -42,7 +69,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 
 	// Fetch user
 	if err := uc.session.DB("go_rest_tutorial").C("users").FindId(oid).One(&u); err != nil {
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound) //404
 		return
 	}
 
@@ -54,30 +81,6 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK) // 200
 	fmt.Fprintf(w, "%s\n", uj)
-}
-
-//CreateUser Controller for creating a new user
-func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	// Stub a user to be populated from the body
-	u := models.User{}
-
-	// Populate the user data
-	json.NewDecoder(r.Body).Decode(&u)
-
-	// Add an Id
-	u.Id = bson.NewObjectId()
-
-	// Write the user to mongo
-	uc.session.DB("go_rest_tutorial").C("users").Insert(u)
-
-	// Marshal provided interface into JSON structure
-	//TODO: understand Marshal
-	uj, _ := json.Marshal(u)
-
-	// Write content-type, statuscode, payload
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated) //201
-	fmt.Fprintf(w, "%s", uj)
 }
 
 // RemoveUser removes an existing user resource DELETE

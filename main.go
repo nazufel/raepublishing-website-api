@@ -25,9 +25,10 @@ func main() {
 
 	// Init UserController
 	uc := controllers.NewUserController(getSession())
-	// User Handlers
+	// User Controllers
 	r.GET("/users/:id", uc.GetUser)
 	r.POST("/users/", uc.CreateUser)
+	r.PUT("/users/", uc.CreateUser)
 	r.DELETE("/users/:id", uc.DeleteUser)
 	// Start the server
 	http.ListenAndServe("localhost:3000", r)
