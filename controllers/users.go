@@ -17,45 +17,46 @@ type UserController struct {
 	session *mgo.Session
 }
 
-/*NewUserConroller represents the controller for updating new User Resources
-feeding New UseConroller the *mgo.Session pointer allows it to use mongo */
+// NewUserConroller represents the controller for updating new User Resources
 func NewUserController(s *mgo.Session) *UserController {
 	// init mongo
 	return &UserController{s}
 }
 
-// GET - GetUser retrieves an individual user resource
+//GetUser retrieves an individual user resource
 func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	// Get user id
+	// Grab id
 	id := p.ByName("id")
 
-	// Verify id is ObjectId, otherwise fail
+	// Verify id is ObjectId hex representation, otherwise return status not found
 	if !bson.IsObjectIdHex(id) {
-		w.WriteHeader(http.StatusNotFound) //404
+		w.WriteHeader(http.StatusNotFound) // 404
 		return
 	}
-	// Grab id
+
+	// ObjectIdHex returns an ObjectId from the provided hex representation.
 	oid := bson.ObjectIdHex(id)
 
-	// Init user
+	// composite literal
 	u := models.User{}
 
-	// Get users
-	// DB("go_test_tutorial") == is the Database to use. C("users") == the collection.
-	if err := uc.session.DB("go_test_tutorial").C("users").FindId(oid).One(&u); err != nil {
-		w.WriteHeader(http.StatusNotFound) //404
+	// Fetch user
+	if err := uc.session.DB("go_rest_tutorial").C("users").FindId(oid).One(&u); err != nil {
+		w.WriteHeader(404)
 		return
 	}
-	// Marshal provided interface into JSON structure
-	uj, _ := json.Marshal(u)
 
-	// Write content-type, statuscode, payload
+	uj, err := json.Marshal(u)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK) //200
-	fmt.Fprintf(w, "%s", uj)
+	w.WriteHeader(http.StatusOK) // 200
+	fmt.Fprintf(w, "%s\n", uj)
 }
 
-// POST - Controller for creating a new user
+//CreateUser Controller for creating a new user
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// Stub a user to be populated from the body
 	u := models.User{}
