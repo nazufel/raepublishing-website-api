@@ -25,7 +25,7 @@ func main() {
 
 	// Init UserController
 	uc := controllers.NewUserController(getSession())
-	// Add handler on /test
+	// User Handlers
 	r.GET("/user/:id", uc.GetUser)
 	r.POST("/user/", uc.CreateUser)
 	r.DELETE("/user/:id", uc.DeleteUser)
