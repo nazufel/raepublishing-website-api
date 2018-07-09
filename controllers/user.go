@@ -31,7 +31,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 
 	// Verify id is ObjectId, otherwise fail
 	if !bson.IsObjectIdHex(id) {
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound) //404
 		return
 	}
 	// Grab id
@@ -41,8 +41,9 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 	u := models.User{}
 
 	// Get users
+	// DB("go_test_tutorial") == is the Database to use. C("users") == the collection.
 	if err := uc.session.DB("go_test_tutorial").C("users").FindId(oid).One(&u); err != nil {
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound) //404
 		return
 	}
 	// Marshal provided interface into JSON structure
@@ -50,7 +51,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 
 	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK) //200
 	fmt.Fprintf(w, "%s", uj)
 }
 
@@ -74,12 +75,12 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 
 	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
+	w.WriteHeader(http.StatusCreated) //201
 	fmt.Fprintf(w, "%s", uj)
 }
 
 // RemoveUser removes an existing user resource DELETE
 func (uc UserController) DeleteUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// TODO: will write logic for this when DB is implimented. Just posting status code for now
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK) //200
 }
