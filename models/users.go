@@ -2,8 +2,8 @@ package models
 
 import "gopkg.in/mgo.v2/bson"
 
-//Struct to hold user data
-type User struct {
+//Users struct to hold user data
+type Users struct {
 	// User represents the structure of the resource, using bson to store in mongo
 	// ObjectId uses mongo's id service to assign a user id
 	ID     bson.ObjectId `json:"id" bson:"_id"`

@@ -30,7 +30,7 @@ func NewUserController(s *mgo.Session) *UserController {
 //CreateUser Controller for creating a new user
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// Stub a user to be populated from the body
-	u := models.User{}
+	u := models.Users{}
 
 	// Populate the user data
 	json.NewDecoder(r.Body).Decode(&u)
@@ -68,7 +68,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 	oid := bson.ObjectIdHex(id)
 
 	// composite literal
-	u := models.User{}
+	u := models.Users{}
 
 	// Fetch user
 	if err := uc.session.DB("go_rest_tutorial").C("users").FindId(oid).One(&u); err != nil {
@@ -88,7 +88,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 
 //GetAllUsers returns all users in the collection
 func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	u := models.User{}
+	u := models.Users{}
 
 	// Fetch users
 	if err := uc.session.DB("go_rest_tutorial").C("users").Find(&u); err != nil {
@@ -103,7 +103,7 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(models.User{})
+	json.NewEncoder(w).Encode(models.Users{})
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
