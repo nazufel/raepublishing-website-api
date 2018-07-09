@@ -17,7 +17,7 @@ type UserController struct {
 	session *mgo.Session
 }
 
-// NewUserConroller represents the controller for updating new User Resources
+//NewUserController represents the controller for updating new User Resources
 func NewUserController(s *mgo.Session) *UserController {
 	// init mongo
 	return &UserController{s}
@@ -26,6 +26,7 @@ func NewUserController(s *mgo.Session) *UserController {
 // CRUD HANDLERS //
 
 // CREATE: POST, PUT
+
 //CreateUser Controller for creating a new user
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// Stub a user to be populated from the body
@@ -51,6 +52,7 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 }
 
 // READ: GET //
+
 //GetUser retrieves an individual user resource
 func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// Grab id
@@ -84,6 +86,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
+//GetAllUsers returns all users in the collection
 func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	u := models.User{}
 
