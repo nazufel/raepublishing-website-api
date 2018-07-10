@@ -107,6 +107,8 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
+// TODO: Add Update handler
+
 // DeleteUser removes an existing user resource DELETE
 func (uc UserController) DeleteUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// TODO: will write logic for this when DB is implimented. Just posting status code for now
