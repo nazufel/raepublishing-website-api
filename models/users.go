@@ -13,7 +13,7 @@ type Users struct {
 	LastName  string        `json:"lastname" bson:"lastname"`
 	Username  string        `json:"username" bson:"username"`
 	Password  string        `json:"password" bson:"password"`
-	Email     string        `json:"age" bson:"age"`
+	Email     string        `json:"email" bson:"email"`
 	Role      string        `json:"role" bson:"role"`
 }
 
