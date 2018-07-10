@@ -1,0 +1,21 @@
+[
+    {
+        "id": "5b44f481b6e6eb5b3b0ec14d",
+        "firstname": "Bobbi",
+        "lastname": "Burger",
+        "username": "bburger",
+        "password": "1234",
+        "email": "bburger@acme.com",
+        "role": "Admin"
+    },
+    {
+        "id": "5b450e42b6e6eb6c0850af1d",
+        "firstname": "Robert",
+        "lastname": "Burger",
+        "username": "rburger",
+        "password": "1234",
+        "email": "rburger2@acme.com",
+        "role": "Viewer"
+    }
+]
+
