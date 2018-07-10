@@ -9,12 +9,12 @@ type Users struct {
 	// Users represents the structure of the resource, using bson to store in mongo
 	// ObjectId uses mongo's id service to assign a user id
 	ID        bson.ObjectId `json:"id" bson:"_id"`
-	FirstName string        `json:"firstname" bson:"firstname"`
-	LastName  string        `json:"lastname" bson:"lastname"`
-	Username  string        `json:"username" bson:"username"`
-	Password  string        `json:"password" bson:"password"`
-	Email     string        `json:"email" bson:"email"`
-	Role      string        `json:"role" bson:"role"`
+	FirstName string        `json:"firstname" bson:"firstname, omitempty"`
+	LastName  string        `json:"lastname" bson:"lastname, omitempty"`
+	Username  string        `json:"username" bson:"username, omitempty"`
+	Password  string        `json:"password" bson:"password, omitempty"`
+	Email     string        `json:"email" bson:"email, omitempty"`
+	Role      string        `json:"role" bson:"role, omitempty"`
 }
 
 /*

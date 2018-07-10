@@ -110,6 +110,33 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 
 // TODO: Add Update controller
 
+func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	u := models.Users{}
+
+	// get the user id from the httprouter parameter
+	id := p.ByName("id")
+
+	// verify id is Objectid
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+
+	// get ObjectId
+	oid := bson.ObjectIdHex(id)
+
+	change := mgo.Change{
+		Update:    bson.M{"$inc": bson.M{"n": 1}, "$set": bson.M{"firstname": u.FirstName}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	err := uc.session.DB("go_rest_tutorial").C("users").Find(bson.M{"_id": id}).Apply(change)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+}
+
 // DeleteUser removes an existing user resource DELETE
 func (uc UserController) DeleteUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// get the user id from the httprouter parameter
