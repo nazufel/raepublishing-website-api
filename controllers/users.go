@@ -88,15 +88,16 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 
 //GetAllUsers returns all users in the collection
 func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	u := models.Users{}
+	var users []models.Users
 
 	// Fetch users
-	if err := uc.session.DB("go_rest_tutorial").C("users").Find(&u); err != nil {
+	err := uc.session.DB("go_rest_tutorial").C("users").Find(bson.M{}).All(&users)
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound) //404
 		return
 	}
 
-	uj, err := json.Marshal(u)
+	uj, err := json.Marshal(users)
 	if err != nil {
 		fmt.Println(err)
 	}
