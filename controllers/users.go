@@ -53,8 +53,8 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 
 // READ: GET //
 
-//GetUser retrieves an individual user resource
-func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+//GetUsers retrieves an individual user resource
+func (uc UserController) GetUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// Grab id
 	id := p.ByName("id")
 
@@ -108,10 +108,29 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
-// TODO: Add Update handler
+// TODO: Add Update controller
 
 // DeleteUser removes an existing user resource DELETE
-func (uc UserController) DeleteUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	// TODO: will write logic for this when DB is implimented. Just posting status code for now
-	w.WriteHeader(http.StatusOK) //200
+func (uc UserController) DeleteUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// get the user id from the httprouter parameter
+	id := p.ByName("id")
+
+	// verify id is Objectid
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+
+	// get ObjectId
+	oid := bson.ObjectIdHex(id)
+
+	// delete user
+	err := uc.session.DB("go_rest_tutorial").C("users").RemoveId(oid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
