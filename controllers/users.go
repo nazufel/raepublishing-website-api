@@ -128,6 +128,7 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 
 	//MongoDB query
 	change := mgo.Change{
+		//TODO: Fix this query that inserts an empty string into firstname field in the user document
 		Update:    bson.M{"$set": bson.M{"firstname": u.FirstName}},
 		Upsert:    false,
 		Remove:    false,
