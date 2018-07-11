@@ -29,6 +29,7 @@ func NewUserController(s *mgo.Session) *UserController {
 
 //CreateUser Controller for creating a new user
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//TODO: verify username and email are unique
 	// Stub a user to be populated from the body
 	u := models.Users{}
 
@@ -108,10 +109,10 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
-// TODO: Add Update controller
-
-func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+//UpdateUsers controller to update user document fields
+func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	u := models.Users{}
+	s := uc.session.DB("go_rest_tutorial").C("users")
 
 	// get the user id from the httprouter parameter
 	id := p.ByName("id")
@@ -125,19 +126,30 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	// get ObjectId
 	oid := bson.ObjectIdHex(id)
 
+	//MongoDB query
 	change := mgo.Change{
-		Update:    bson.M{"$inc": bson.M{"n": 1}, "$set": bson.M{"firstname": u.FirstName}},
+		Update:    bson.M{"$set": bson.M{"firstname": u.FirstName}},
 		Upsert:    false,
 		Remove:    false,
 		ReturnNew: true,
 	}
-	err := uc.session.DB("go_rest_tutorial").C("users").Find(bson.M{"_id": id}).Apply(change)
+	// store updated document in result variable
+	var result bson.M
+
+	// apply the updated document
+	_, err := s.Find(bson.M{"_id": oid}).Apply(change, &result)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	return
 }
 
-// DeleteUser removes an existing user resource DELETE
+// DeleteUsers removes an existing user resource DELETE
 func (uc UserController) DeleteUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// get the user id from the httprouter parameter
 	id := p.ByName("id")
