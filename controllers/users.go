@@ -87,6 +87,8 @@ func (uc UserController) GetUsers(w http.ResponseWriter, r *http.Request, p http
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
+//TODO: Decide if returning an array of users instead of each individual users is okay.
+
 //GetAllUsers returns all users in the collection
 func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	var users []models.Users
@@ -111,7 +113,7 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 
 //UpdateUsers controller to update user document fields
 func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	u := models.Users{}
+	//decoder := json.NewDecoder(r.Body)
 	s := uc.session.DB("go_rest_tutorial").C("users")
 
 	// get the user id from the httprouter parameter
@@ -126,10 +128,14 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 	// get ObjectId
 	oid := bson.ObjectIdHex(id)
 
-	//MongoDB query
-	change := mgo.Change{
-		//TODO: Fix this query that inserts an empty string into firstname field in the user document
-		Update:    bson.M{"$set": bson.M{"firstname": u.FirstName}},
+	//MongoDB query, build the changes
+	changeFirstName := mgo.Change{
+		/*Breakthrough: feeding the Query.Apply method u.FirstName gives it the
+		+empty values in the models.Users{} struct. Need to parse the json http
+		+payload for specific fields, ie: {"firstname": "Bobby"} and update only
+		+those fields.
+		*/
+		Update:    bson.M{"$set": bson.M{"firstname": "Bobby"}},
 		Upsert:    false,
 		Remove:    false,
 		ReturnNew: true,
@@ -137,8 +143,8 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 	// store updated document in result variable
 	var result bson.M
 
-	// apply the updated document
-	_, err := s.Find(bson.M{"_id": oid}).Apply(change, &result)
+	// apply the changes to the document(s)
+	_, err := s.Find(bson.M{"_id": oid}).Apply(changeFirstName, &result)
 
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound) //404
@@ -147,7 +153,6 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	return
 }
 
 // DeleteUsers removes an existing user resource DELETE
