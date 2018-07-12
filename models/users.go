@@ -2,6 +2,9 @@ package models
 
 import "gopkg.in/mgo.v2/bson"
 
+/* Not sure if i'm going to even need this with oAuth. Kind of forgot i was going
++to do that. However, this is good practice for CRUD.
+*/
 //TODO: Encrypt user passwords
 //TODO: Add user profile pictures if oAuth doesn't pull them in from Facebook
 //TODO: Add user Bio.
@@ -14,7 +17,6 @@ type Users struct {
 	FirstName string        `json:"firstname" bson:"firstname"`
 	LastName  string        `json:"lastname" bson:"lastname"`
 	Username  string        `json:"username" bson:"username"`
-	Password  string        `json:"password" bson:"password"`
 	Email     string        `json:"email" bson:"email"`
 	Role      string        `json:"role" bson:"role"`
 }

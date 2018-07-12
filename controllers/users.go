@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -113,7 +114,14 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 
 //UpdateUsers controller to update user document fields
 func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	//decoder := json.NewDecoder(r.Body)
+	//read the request message and parse the fields
+	decoder := json.NewDecoder(r.Body)
+	var us models.Users
+	err := decoder.Decode(&us)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	s := uc.session.DB("go_rest_tutorial").C("users")
 
 	// get the user id from the httprouter parameter
@@ -135,7 +143,7 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 		+payload for specific fields, ie: {"firstname": "Bobby"} and update only
 		+those fields.
 		*/
-		Update:    bson.M{"$set": bson.M{"firstname": "Bobby"}},
+		Update:    bson.M{"$set": bson.M{"firstname": us.FirstName}},
 		Upsert:    false,
 		Remove:    false,
 		ReturnNew: true,
@@ -144,7 +152,7 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 	var result bson.M
 
 	// apply the changes to the document(s)
-	_, err := s.Find(bson.M{"_id": oid}).Apply(changeFirstName, &result)
+	_, err = s.Find(bson.M{"_id": oid}).Apply(changeFirstName, &result)
 
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound) //404
