@@ -138,11 +138,7 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 
 	//MongoDB query, build the changes
 	changeFirstName := mgo.Change{
-		/*Breakthrough: feeding the Query.Apply method u.FirstName gives it the
-		+empty values in the models.Users{} struct. Need to parse the json http
-		+payload for specific fields, ie: {"firstname": "Bobby"} and update only
-		+those fields.
-		*/
+		// Now to need to loop through users scruct
 		Update:    bson.M{"$set": bson.M{"firstname": us.FirstName}},
 		Upsert:    false,
 		Remove:    false,
