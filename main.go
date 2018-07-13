@@ -34,7 +34,12 @@ func main() {
 	r.PUT("/users/", uc.CreateUser)
 	r.GET("/users/:id", uc.GetUsers)
 	r.GET("/users/", uc.GetAllUsers)
-	r.PATCH("/users/:id", uc.UpdateUsers)
+	r.PATCH("/users/firstname/:id", uc.UpdateUsersFirstname)
+	r.PATCH("/users/lastname/:id", uc.UpdateUsersLastname)
+	r.PATCH("/users/username/:id", uc.UpdateUsersUsername)
+	r.PATCH("/users/email/:id", uc.UpdateUsersEmail)
+	r.PATCH("/users/role/:id", uc.UpdateUsersRole)
+	r.PATCH("/users/bio/:id", uc.UpdateUsersBio)
 	r.DELETE("/users/:id", uc.DeleteUsers)
 	// Start the server
 	http.ListenAndServe("localhost:3000", r)

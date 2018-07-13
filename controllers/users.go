@@ -117,8 +117,8 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
-//UpdateUsers controller to update user document fields
-func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+//UpdateUsersFirstname controller to update user document fields
+func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//read the request message and parse the fields
 	decoder := json.NewDecoder(r.Body)
 	var us models.Users
@@ -142,7 +142,55 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 	oid := bson.ObjectIdHex(id)
 
 	//MongoDB query, build the changes
-	changeFirstName := mgo.Change{
+	change := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"firstname": us.FirstName}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var result bson.M
+
+	// apply the changes to the document(s)
+	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(models.Users{})
+}
+
+//UpdateUsersLastname updates the user's lastname field
+func (uc UserController) UpdateUsersLastname(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//read the request message and parse the fields
+	decoder := json.NewDecoder(r.Body)
+	var us models.Users
+	err := decoder.Decode(&us)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := uc.session.DB("go_rest_tutorial").C("users")
+
+	// get the user id from the httprouter parameter
+	id := p.ByName("id")
+
+	// verify id is Objectid
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+
+	// get ObjectId
+	oid := bson.ObjectIdHex(id)
+
+	//MongoDB query, build the changes
+	change := mgo.Change{
 		// Now to need to loop through users scruct
 		Update:    bson.M{"$set": bson.M{"lastname": us.LastName}},
 		Upsert:    false,
@@ -153,7 +201,203 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 	var result bson.M
 
 	// apply the changes to the document(s)
-	_, err = s.Find(bson.M{"_id": oid}).Apply(changeFirstName, &result)
+	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(models.Users{})
+}
+
+//r.PATCH("/users/:id", uc.UpdateUsersUsername)
+//UpdateUsersUsername updates the user's username field
+func (uc UserController) UpdateUsersUsername(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//read the request message and parse the fields
+	decoder := json.NewDecoder(r.Body)
+	var us models.Users
+	err := decoder.Decode(&us)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := uc.session.DB("go_rest_tutorial").C("users")
+
+	// get the user id from the httprouter parameter
+	id := p.ByName("id")
+
+	// verify id is Objectid
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+
+	// get ObjectId
+	oid := bson.ObjectIdHex(id)
+
+	//MongoDB query, build the changes
+	change := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"username": us.Username}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var result bson.M
+
+	// apply the changes to the document(s)
+	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(models.Users{})
+}
+
+//r.PATCH("/users/:id", uc.UpdateUsersEmail)
+//UpdateUsersLastname updates the user's lastname field
+func (uc UserController) UpdateUsersEmail(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//read the request message and parse the fields
+	decoder := json.NewDecoder(r.Body)
+	var us models.Users
+	err := decoder.Decode(&us)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := uc.session.DB("go_rest_tutorial").C("users")
+
+	// get the user id from the httprouter parameter
+	id := p.ByName("id")
+
+	// verify id is Objectid
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+
+	// get ObjectId
+	oid := bson.ObjectIdHex(id)
+
+	//MongoDB query, build the changes
+	change := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"email": us.Email}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var result bson.M
+
+	// apply the changes to the document(s)
+	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(models.Users{})
+}
+
+//r.PATCH("/users/:id", uc.UpdateUsersUsername)
+//UpdateUsersUsername updates the user's username field
+func (uc UserController) UpdateUsersRole(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//read the request message and parse the fields
+	decoder := json.NewDecoder(r.Body)
+	var us models.Users
+	err := decoder.Decode(&us)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := uc.session.DB("go_rest_tutorial").C("users")
+
+	// get the user id from the httprouter parameter
+	id := p.ByName("id")
+
+	// verify id is Objectid
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+
+	// get ObjectId
+	oid := bson.ObjectIdHex(id)
+
+	//MongoDB query, build the changes
+	change := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"role": us.Role}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var result bson.M
+
+	// apply the changes to the document(s)
+	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(models.Users{})
+}
+
+//r.PATCH("/users/:id", uc.UpdateUsersRole)
+//UpdateUsersLastname updates the user's lastname field
+func (uc UserController) UpdateUsersBio(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//read the request message and parse the fields
+	decoder := json.NewDecoder(r.Body)
+	var us models.Users
+	err := decoder.Decode(&us)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := uc.session.DB("go_rest_tutorial").C("users")
+
+	// get the user id from the httprouter parameter
+	id := p.ByName("id")
+
+	// verify id is Objectid
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+
+	// get ObjectId
+	oid := bson.ObjectIdHex(id)
+
+	//MongoDB query, build the changes
+	change := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"bio": us.Bio}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var result bson.M
+
+	// apply the changes to the document(s)
+	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
 
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound) //404
