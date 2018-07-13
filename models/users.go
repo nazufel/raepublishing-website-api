@@ -19,6 +19,7 @@ type Users struct {
 	Username  string        `json:"username" bson:"username"`
 	Email     string        `json:"email" bson:"email"`
 	Role      string        `json:"role" bson:"role"`
+	Bio       string        `json:"bio" bson:"bio"`
 }
 
 /*

@@ -92,6 +92,11 @@ func (uc UserController) GetUsers(w http.ResponseWriter, r *http.Request, p http
 
 //GetAllUsers returns all users in the collection
 func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+	/* not a good implimentation. need to find another way to return all users.
+	I think returning the slice []models.Users is messing with the browser.
+	Using the browser returns an empty array.
+	*/
 	var users []models.Users
 
 	// Fetch users
@@ -139,7 +144,7 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 	//MongoDB query, build the changes
 	changeFirstName := mgo.Change{
 		// Now to need to loop through users scruct
-		Update:    bson.M{"$set": bson.M{"firstname": us.FirstName}},
+		Update:    bson.M{"$set": bson.M{"lastname": us.LastName}},
 		Upsert:    false,
 		Remove:    false,
 		ReturnNew: true,
@@ -157,6 +162,7 @@ func (uc UserController) UpdateUsers(w http.ResponseWriter, r *http.Request, p h
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(models.Users{})
 }
 
 // DeleteUsers removes an existing user resource DELETE
