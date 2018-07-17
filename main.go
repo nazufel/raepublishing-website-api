@@ -22,25 +22,26 @@ func getSession() *mgo.Session {
 
 func main() {
 	// Init router
-	/* TODO: Evaluate whether to continue using the julienschmidt router or Gorilla Mux.
-	+ Gorilla Mux does allow multiple methods per route. It could be nice to have POST and PUT
-	+ for create and update users*/
 	r := httprouter.New()
+
+	//path extention to endpoints not at the root of the domain
+	//+http://raepublishing.com/api/v1/
+	extention := "/api/v1"
 
 	// Init UserController
 	uc := controllers.NewUserController(getSession())
 	// User Controllers
-	r.POST("/users/", uc.CreateUser)
-	r.PUT("/users/", uc.CreateUser)
-	r.GET("/users/:id", uc.GetUsers)
-	r.GET("/users/", uc.GetAllUsers)
-	r.PATCH("/users/firstname/:id", uc.UpdateUsersFirstname)
-	r.PATCH("/users/lastname/:id", uc.UpdateUsersLastname)
-	r.PATCH("/users/username/:id", uc.UpdateUsersUsername)
-	r.PATCH("/users/email/:id", uc.UpdateUsersEmail)
-	r.PATCH("/users/role/:id", uc.UpdateUsersRole)
-	r.PATCH("/users/bio/:id", uc.UpdateUsersBio)
-	r.DELETE("/users/:id", uc.DeleteUsers)
+	r.POST(extention+"/users/", uc.CreateUser)
+	r.PUT(extention+"/users/", uc.CreateUser)
+	r.GET(extention+"/users/:id", uc.GetUsers)
+	r.GET(extention+"/users/", uc.GetAllUsers)
+	r.PATCH(extention+"/users/firstname/:id", uc.UpdateUsersFirstname)
+	r.PATCH(extention+"/users/lastname/:id", uc.UpdateUsersLastname)
+	r.PATCH(extention+"/users/username/:id", uc.UpdateUsersUsername)
+	r.PATCH(extention+"/users/email/:id", uc.UpdateUsersEmail)
+	r.PATCH(extention+"/users/role/:id", uc.UpdateUsersRole)
+	r.PATCH(extention+"/users/bio/:id", uc.UpdateUsersBio)
+	r.DELETE(extention+"/users/:id", uc.DeleteUsers)
 	// Start the server
 	http.ListenAndServe("localhost:3000", r)
 }
