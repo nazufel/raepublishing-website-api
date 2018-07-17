@@ -12,25 +12,7 @@ host/users/ - returns all users, will apply filters later
 
 // Where the real CRUD happens
 host/users/:id
-
-// POST, GET, PUT, PATCH, DELETE - endpoint behavior changes based on method used. Example:
-func users(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-    switch m {
-        case 'if r.Method == "POST"':
-            // method to create a user
-        case 'if r.Method == GET':
-            // method to return specific user
-        case 'if r.Method == "PUT"':
-            // method to update specific user
-        case 'if r.Method == "PATCH"':
-            // method to update specific user field(s)
-        case 'if r.Method == "DELETE"':
-            // method to delete the specific user
-    }
-}
-
 ```
-
 
 ## List of Must Haves (in no particular order)
 
