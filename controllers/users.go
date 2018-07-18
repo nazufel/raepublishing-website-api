@@ -118,8 +118,8 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 
 //UpdateUser function to update a user fields
 func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	//shorten session string
-	s := uc.session.DB("go_rest_tutorial").C("users")
+	//shorten collection string
+	col := uc.session.DB("go_rest_tutorial").C("users")
 	// init User model
 	var u models.Users
 
@@ -138,7 +138,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 
 	// Write the user to mongo
 	upsertdata := bson.M{"$set": change}
-	err := s.Update(id, upsertdata)
+	err := col.Update(id, upsertdata)
 	if err != nil {
 		//TODO: handle errors better
 		w.WriteHeader(http.StatusNotFound)
@@ -148,8 +148,9 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) //201
+	json.NewEncoder(w).Encode(models.Users{})
 	//print the changed payload
-	fmt.Fprintf(w, "%s", change)
+	fmt.Println(change)
 }
 
 /*
