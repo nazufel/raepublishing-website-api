@@ -25,23 +25,26 @@ func main() {
 	r := httprouter.New()
 
 	//path extention to endpoints not at the root of the domain
-	//+http://raepublishing.com/api/v1/
-	extention := "/api/v1"
+	//+i.e.: http://raepublishing.com/api/v1/
+	extension := "/api/v1"
 
 	// Init UserController
 	uc := controllers.NewUserController(getSession())
 	// User Controllers
-	r.POST(extention+"/users/", uc.CreateUser)
-	r.PUT(extention+"/users/", uc.CreateUser)
-	r.GET(extention+"/users/:id", uc.GetUsers)
-	r.GET(extention+"/users/", uc.GetAllUsers)
-	r.PATCH(extention+"/users/firstname/:id", uc.UpdateUsersFirstname)
-	r.PATCH(extention+"/users/lastname/:id", uc.UpdateUsersLastname)
-	r.PATCH(extention+"/users/username/:id", uc.UpdateUsersUsername)
-	r.PATCH(extention+"/users/email/:id", uc.UpdateUsersEmail)
-	r.PATCH(extention+"/users/role/:id", uc.UpdateUsersRole)
-	r.PATCH(extention+"/users/bio/:id", uc.UpdateUsersBio)
-	r.DELETE(extention+"/users/:id", uc.DeleteUsers)
+	r.POST(extension+"/users/", uc.CreateUser)
+	r.PUT(extension+"/users/", uc.CreateUser)
+	r.GET(extension+"/users/:id", uc.GetUsers)
+	r.GET(extension+"/users/", uc.GetAllUsers)
+	r.PATCH(extension+"/users/:id", uc.UpdateUser)
+	/*
+		r.PATCH(extention+"/users/firstname/:id", uc.UpdateUsersFirstname)
+		r.PATCH(extention+"/users/lastname/:id", uc.UpdateUsersLastname)
+		r.PATCH(extention+"/users/username/:id", uc.UpdateUsersUsername)
+		r.PATCH(extention+"/users/email/:id", uc.UpdateUsersEmail)
+		r.PATCH(extention+"/users/role/:id", uc.UpdateUsersRole)
+		r.PATCH(extention+"/users/bio/:id", uc.UpdateUsersBio)
+	*/
+	r.DELETE(extension+"/users/:id", uc.DeleteUsers)
 	// Start the server
 	http.ListenAndServe("localhost:3000", r)
 }

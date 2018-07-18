@@ -117,6 +117,56 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
+//UpdateUser function to update a user fields
+func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	var (
+		fn = "firstname"
+	)
+	//shorten session string
+	s := uc.session.DB("go_rest_tutorial").C("users")
+	// init User model
+	var us models.Users
+
+	// get the user id from the httprouter parameter and ensure it's a bson object from the DB
+	id := p.ByName("id")
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+	// set var for ObjectId
+	oid := bson.ObjectIdHex(id)
+
+	//read the request message and parse the fields
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&us)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//MongoDB query, build the changes
+	change := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{fn: us.FirstName}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var result bson.M
+
+	// apply the changes to the document(s)
+	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(models.Users{})
+}
+
+/*
 //UpdateUsersFirstname controller to update user document fields
 func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//read the request message and parse the fields
@@ -408,6 +458,8 @@ func (uc UserController) UpdateUsersBio(w http.ResponseWriter, r *http.Request, 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(models.Users{})
 }
+
+*/
 
 // DeleteUsers removes an existing user resource DELETE
 func (uc UserController) DeleteUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
