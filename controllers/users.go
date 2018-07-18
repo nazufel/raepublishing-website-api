@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -47,7 +46,7 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 	//TODO: understand Marshal
 	uj, _ := json.Marshal(u)
 
-	// Write content-type, statuscode, payload
+	// Write content-type and return statuscode and original payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) //201
 	fmt.Fprintf(w, "%s", uj)
@@ -119,51 +118,48 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 
 //UpdateUser function to update a user fields
 func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	var (
-		fn = "firstname"
-	)
 	//shorten session string
 	s := uc.session.DB("go_rest_tutorial").C("users")
 	// init User model
 	var us models.Users
 
-	// get the user id from the httprouter parameter and ensure it's a bson object from the DB
+	// get the user id from the httprouter parameter and ensure it's a valid bson object from the DB
 	id := p.ByName("id")
 	if !bson.IsObjectIdHex(id) {
 		w.WriteHeader(http.StatusNotFound) // 404
 		return
 	}
-	// set var for ObjectId
-	oid := bson.ObjectIdHex(id)
-
 	//read the request message and parse the fields
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&us)
+	change := json.NewDecoder(r.Body)
+	err := change.Decode(&us)
 	if err != nil {
-		log.Fatal(err)
+		//TODO: handle this error better.
+		w.WriteHeader(http.StatusNotFound)
 	}
-	//MongoDB query, build the changes
-	change := mgo.Change{
-		// Now to need to loop through users scruct
-		Update:    bson.M{"$set": bson.M{fn: us.FirstName}},
-		Upsert:    false,
-		Remove:    false,
-		ReturnNew: true,
-	}
-	// store updated document in result variable
-	var result bson.M
 
-	// apply the changes to the document(s)
-	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
-
+	// Marshal provided interface into JSON structure
+	uj, err := json.Marshal(change)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound) //404
-		return
+		w.WriteHeader(http.StatusNotFound)
 	}
 
+	// Populate the user data
+	//json.NewDecoder(r.Body).Decode(change)
+
+	// Write the user to mongo
+	upsertdata := bson.M{"$set": uj}
+	err = s.Update(id, upsertdata)
+	if err != nil {
+		//TODO: handle errors better
+		w.WriteHeader(http.StatusNotFound)
+	}
+	//_, err = s.Find(bson.M{"_id": id}).Apply(decoder)
+
+	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(models.Users{})
+	w.WriteHeader(http.StatusCreated) //201
+	//print the changed payload
+	fmt.Fprintf(w, "%s", uj)
 }
 
 /*
