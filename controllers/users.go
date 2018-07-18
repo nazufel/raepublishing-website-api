@@ -121,7 +121,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	//shorten session string
 	s := uc.session.DB("go_rest_tutorial").C("users")
 	// init User model
-	var us models.Users
+	var u models.Users
 
 	// get the user id from the httprouter parameter and ensure it's a valid bson object from the DB
 	id := p.ByName("id")
@@ -129,37 +129,27 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 		w.WriteHeader(http.StatusNotFound) // 404
 		return
 	}
+
+	// ObjectIdHex returns an ObjectId from the provided hex representation.
+	//oid := bson.ObjectIdHex(id)
+
 	//read the request message and parse the fields
-	change := json.NewDecoder(r.Body)
-	err := change.Decode(&us)
-	if err != nil {
-		//TODO: handle this error better.
-		w.WriteHeader(http.StatusNotFound)
-	}
-
-	// Marshal provided interface into JSON structure
-	uj, err := json.Marshal(change)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-	}
-
-	// Populate the user data
-	//json.NewDecoder(r.Body).Decode(change)
+	change := json.NewDecoder(r.Body).Decode(&u)
 
 	// Write the user to mongo
-	upsertdata := bson.M{"$set": uj}
-	err = s.Update(id, upsertdata)
+	upsertdata := bson.M{"$set": change}
+	err := s.Update(id, upsertdata)
 	if err != nil {
 		//TODO: handle errors better
 		w.WriteHeader(http.StatusNotFound)
+		//fmt.Println(err)
 	}
-	//_, err = s.Find(bson.M{"_id": id}).Apply(decoder)
 
 	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) //201
 	//print the changed payload
-	fmt.Fprintf(w, "%s", uj)
+	fmt.Fprintf(w, "%s", change)
 }
 
 /*

@@ -17,6 +17,8 @@ func getSession() *mgo.Session {
 	if err != nil {
 		panic(err)
 	}
+	//defer s.Close()
+	s.SetMode(mgo.Monotonic, true)
 	return s
 }
 
@@ -36,6 +38,8 @@ func main() {
 	r.GET(extension+"/users/:id", uc.GetUsers)
 	r.GET(extension+"/users/", uc.GetAllUsers)
 	r.PATCH(extension+"/users/:id", uc.UpdateUser)
+	r.PUT(extension+"/users/:id", uc.UpdateUser)
+	r.POST(extension+"/users/:id", uc.UpdateUser)
 	/*
 		r.PATCH(extention+"/users/firstname/:id", uc.UpdateUsersFirstname)
 		r.PATCH(extention+"/users/lastname/:id", uc.UpdateUsersLastname)
