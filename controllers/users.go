@@ -148,7 +148,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) //201
-	json.NewEncoder(w).Encode(models.Users{})
+	json.NewEncoder(w).Encode(change)
 	//print the changed payload
 	fmt.Println(change)
 }
