@@ -24,8 +24,8 @@ type Users struct {
 	Username    string        `json:"username" bson:"username"`
 	Email       string        `json:"email" bson:"email"`
 	Role        string        `json:"role" bson:"role"`
-	Created     time.Time     `json:"created" bson:"created"`
-	LastUpdated time.Time     `json:"lastupdated" bson:"lastupdated"`
+	Created     time.Time     //`json:"created" bson:"created"`
+	LastUpdated time.Time     //`json:"lastupdated" bson:"lastupdated"`
 	Bio         string        `json:"bio" bson:"bio"`
 }
 

@@ -41,12 +41,12 @@ func main() {
 	r.PUT(extension+"/users/:id", uc.UpdateUser)
 	r.POST(extension+"/users/:id", uc.UpdateUser)
 	/*
-		r.PATCH(extention+"/users/firstname/:id", uc.UpdateUsersFirstname)
-		r.PATCH(extention+"/users/lastname/:id", uc.UpdateUsersLastname)
-		r.PATCH(extention+"/users/username/:id", uc.UpdateUsersUsername)
-		r.PATCH(extention+"/users/email/:id", uc.UpdateUsersEmail)
-		r.PATCH(extention+"/users/role/:id", uc.UpdateUsersRole)
-		r.PATCH(extention+"/users/bio/:id", uc.UpdateUsersBio)
+		r.PATCH(extension+"/users/firstname/:id", uc.UpdateUsersFirstname)
+		r.PATCH(extension+"/users/lastname/:id", uc.UpdateUsersLastname)
+		r.PATCH(extension+"/users/username/:id", uc.UpdateUsersUsername)
+		r.PATCH(extension+"/users/email/:id", uc.UpdateUsersEmail)
+		r.PATCH(extension+"/users/role/:id", uc.UpdateUsersRole)
+		r.PATCH(extension+"/users/bio/:id", uc.UpdateUsersBio)
 	*/
 	r.DELETE(extension+"/users/:id", uc.DeleteUsers)
 	// Start the server

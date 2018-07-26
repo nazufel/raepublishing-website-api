@@ -121,7 +121,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	//shorten collection string
 	col := uc.session.DB("go_rest_tutorial").C("users")
 	// init User model
-	var u []models.Users
+	var u models.Users
 
 	// get the user id from the httprouter parameter and ensure it's a valid bson object from the DB
 	id := p.ByName("id")
@@ -134,27 +134,28 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	// oid := bson.ObjectIdHex(id)
 
 	//read the request message and parse the fields
-	jsonBody := json.NewDecoder(r.Body).Decode(u)
-
+	json.NewDecoder(r.Body).Decode(&u)
+	fmt.Println(u)
 	// Unmarshal the array and parse the fields
-	change := json.Unmarshal([]byte(jsonBody), &u)
+	//change := json.Marshal([]byte(jsonBody), &u)
 
 	// update the document with the parsed changes
-	err := col.Update(id, &change)
+	err := col.Update(bson.M{"_id": id}, bson.M{"$set": bson.M{"firstname": u.FirstName}})
 	if err != nil {
 		//TODO: handle errors better
-		panic(err)
+		fmt.Println(err)
 	}
 
 	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) //201
-	json.NewEncoder(w).Encode(change)
+	json.NewEncoder(w).Encode(&u)
 	//print the changed payload
 	//fmt.Println(change)
 }
 
 /*
+
 //UpdateUsersFirstname controller to update user document fields
 func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//read the request message and parse the fields
@@ -448,7 +449,6 @@ func (uc UserController) UpdateUsersBio(w http.ResponseWriter, r *http.Request, 
 }
 
 */
-
 // DeleteUsers removes an existing user resource DELETE
 func (uc UserController) DeleteUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// get the user id from the httprouter parameter
