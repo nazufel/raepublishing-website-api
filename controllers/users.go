@@ -121,7 +121,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	//shorten collection string
 	col := uc.session.DB("go_rest_tutorial").C("users")
 	// init User model
-	var u models.Users
+	var u []models.Users
 
 	// get the user id from the httprouter parameter and ensure it's a valid bson object from the DB
 	id := p.ByName("id")
@@ -131,18 +131,19 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	}
 
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
-	//oid := bson.ObjectIdHex(id)
+	// oid := bson.ObjectIdHex(id)
 
 	//read the request message and parse the fields
-	change := json.NewDecoder(r.Body).Decode(&u)
+	jsonBody := json.NewDecoder(r.Body).Decode(u)
 
-	// Write the user to mongo
-	upsertdata := bson.M{"$set": change}
-	err := col.Update(id, upsertdata)
+	// Unmarshal the array and parse the fields
+	change := json.Unmarshal([]byte(jsonBody), &u)
+
+	// update the document with the parsed changes
+	err := col.Update(id, &change)
 	if err != nil {
 		//TODO: handle errors better
-		w.WriteHeader(http.StatusNotFound)
-		//fmt.Println(err)
+		panic(err)
 	}
 
 	// Write content-type, statuscode, payload
@@ -150,7 +151,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	w.WriteHeader(http.StatusCreated) //201
 	json.NewEncoder(w).Encode(change)
 	//print the changed payload
-	fmt.Println(change)
+	//fmt.Println(change)
 }
 
 /*
