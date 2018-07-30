@@ -160,9 +160,12 @@ func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	uj, _ := json.Marshal(us)
+
+	// Write content-type and return statuscode and original payload
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(models.Users{})
+	w.WriteHeader(http.StatusCreated) //201
+	fmt.Fprintf(w, "%s", uj)
 }
 
 //UpdateUsersLastname updates the user's lastname field
