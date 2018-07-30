@@ -117,46 +117,6 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
-/*
-//UpdateUser function to update a user fields
-func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	//shorten collection string
-	col := uc.session.DB("go_rest_tutorial").C("users")
-	// init User model
-	var u models.Users
-
-	// get the user id from the httprouter parameter and ensure it's a valid bson object from the DB
-	id := p.ByName("id")
-	if !bson.IsObjectIdHex(id) {
-		w.WriteHeader(http.StatusNotFound) // 404
-		return
-	}
-
-	// ObjectIdHex returns an ObjectId from the provided hex representation.
-	oid := bson.ObjectIdHex(id)
-
-	//read the request message and parse the fields
-	json.NewDecoder(r.Body).Decode(&u)
-	fmt.Println(u)
-	// Unmarshal the array and parse the fields
-	//change := json.Marshal([]byte(jsonBody), &u)
-
-	// update the document with the parsed changes
-	err := col.Update(bson.M{"_id": oid}, bson.M{"$set": bson.M{"firstname": u.FirstName}})
-	if err != nil {
-		//TODO: handle errors better
-		fmt.Println(err)
-	}
-
-	// Write content-type, statuscode, payload
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated) //201
-	json.NewEncoder(w).Encode(&u)
-	//print the changed payload
-	//fmt.Println(change)
-}
-*/
-
 //UpdateUsersFirstname controller to update user document fields
 func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//read the request message and parse the fields
