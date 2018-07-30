@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -116,6 +117,7 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
+/*
 //UpdateUser function to update a user fields
 func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//shorten collection string
@@ -131,7 +133,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	}
 
 	// ObjectIdHex returns an ObjectId from the provided hex representation.
-	// oid := bson.ObjectIdHex(id)
+	oid := bson.ObjectIdHex(id)
 
 	//read the request message and parse the fields
 	json.NewDecoder(r.Body).Decode(&u)
@@ -140,7 +142,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	//change := json.Marshal([]byte(jsonBody), &u)
 
 	// update the document with the parsed changes
-	err := col.Update(bson.M{"_id": id}, bson.M{"$set": bson.M{"firstname": u.FirstName}})
+	err := col.Update(bson.M{"_id": oid}, bson.M{"$set": bson.M{"firstname": u.FirstName}})
 	if err != nil {
 		//TODO: handle errors better
 		fmt.Println(err)
@@ -153,8 +155,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	//print the changed payload
 	//fmt.Println(change)
 }
-
-/*
+*/
 
 //UpdateUsersFirstname controller to update user document fields
 func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -193,9 +194,9 @@ func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Req
 
 	// apply the changes to the document(s)
 	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
-
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound) //404
+		fmt.Println(err)
+		//w.WriteHeader(http.StatusNotFound) //404
 		return
 	}
 
@@ -448,7 +449,6 @@ func (uc UserController) UpdateUsersBio(w http.ResponseWriter, r *http.Request, 
 	json.NewEncoder(w).Encode(models.Users{})
 }
 
-*/
 // DeleteUsers removes an existing user resource DELETE
 func (uc UserController) DeleteUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// get the user id from the httprouter parameter
