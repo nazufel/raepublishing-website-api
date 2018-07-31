@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/nazufel/raepublishing-website-api/models"
@@ -24,33 +25,71 @@ func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }
 
+// ############# //
 // CRUD HANDLERS //
+// ############# //
 
 // CREATE: POST, PUT
 
 //CreateUser Controller for creating a new user
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//TODO: verify username and email are unique
+	// shorten db string
+	col := uc.session.DB("go_rest_tutorial").C("users")
 	// Stub a user to be populated from the body
-	u := models.Users{}
+	us := models.Users{}
 
 	// Populate the user data
-	json.NewDecoder(r.Body).Decode(&u)
+	json.NewDecoder(r.Body).Decode(&us)
 
 	// Add an Id
-	u.ID = bson.NewObjectId()
+	us.ID = bson.NewObjectId()
 
 	// Write the user to mongo
-	uc.session.DB("go_rest_tutorial").C("users").Insert(u)
+	col.Insert(us)
 
-	// Marshal provided interface into JSON structure
-	//TODO: understand Marshal
-	uj, _ := json.Marshal(u)
+	//Write a Created time
+	createdTime := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"created": time.Now()}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var createdResult bson.M
+
+	// apply the changes to the document
+	_, err := col.Find(bson.M{"_id": us.ID}).Apply(createdTime, &createdResult)
+	if err != nil {
+		fmt.Println(err)
+		//w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	//Write the updated time
+	updatedTime := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"updated": time.Now()}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var updatedResult bson.M
+
+	// apply the changes to the document
+	_, err = col.Find(bson.M{"_id": us.ID}).Apply(updatedTime, &updatedResult)
+	if err != nil {
+		fmt.Println(err)
+		//w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
 
 	// Write content-type and return statuscode and original payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) //201
-	fmt.Fprintf(w, "%s", uj)
+	//TODO: set up http redirect
 }
 
 // READ: GET //
@@ -127,7 +166,7 @@ func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Req
 		log.Fatal(err)
 	}
 
-	s := uc.session.DB("go_rest_tutorial").C("users")
+	col := uc.session.DB("go_rest_tutorial").C("users")
 
 	// get the user id from the httprouter parameter
 	id := p.ByName("id")
@@ -153,7 +192,26 @@ func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Req
 	var result bson.M
 
 	// apply the changes to the document(s)
-	_, err = s.Find(bson.M{"_id": oid}).Apply(change, &result)
+	_, err = col.Find(bson.M{"_id": oid}).Apply(change, &result)
+	if err != nil {
+		fmt.Println(err)
+		//w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	//Write the updated time
+	updatedTime := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"updated": time.Now()}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var updatedResult bson.M
+
+	// apply the changes to the document
+	_, err = col.Find(bson.M{"_id": us.ID}).Apply(updatedTime, &updatedResult)
 	if err != nil {
 		fmt.Println(err)
 		//w.WriteHeader(http.StatusNotFound) //404
@@ -164,7 +222,7 @@ func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Req
 
 	// Write content-type and return statuscode and original payload
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated) //201
+	w.WriteHeader(http.StatusAccepted) //202
 	fmt.Fprintf(w, "%s", uj)
 }
 
@@ -216,7 +274,6 @@ func (uc UserController) UpdateUsersLastname(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(models.Users{})
 }
 
-//r.PATCH("/users/:id", uc.UpdateUsersUsername)
 //UpdateUsersUsername updates the user's username field
 func (uc UserController) UpdateUsersUsername(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//read the request message and parse the fields
@@ -265,8 +322,7 @@ func (uc UserController) UpdateUsersUsername(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(models.Users{})
 }
 
-//r.PATCH("/users/:id", uc.UpdateUsersEmail)
-//UpdateUsersLastname updates the user's lastname field
+//UpdateUsersEmail updates the user's lastname field
 func (uc UserController) UpdateUsersEmail(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//read the request message and parse the fields
 	decoder := json.NewDecoder(r.Body)
@@ -314,8 +370,7 @@ func (uc UserController) UpdateUsersEmail(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(models.Users{})
 }
 
-//r.PATCH("/users/:id", uc.UpdateUsersUsername)
-//UpdateUsersUsername updates the user's username field
+//UpdateUsersRole updates the user's username field
 func (uc UserController) UpdateUsersRole(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//read the request message and parse the fields
 	decoder := json.NewDecoder(r.Body)
@@ -363,8 +418,7 @@ func (uc UserController) UpdateUsersRole(w http.ResponseWriter, r *http.Request,
 	json.NewEncoder(w).Encode(models.Users{})
 }
 
-//r.PATCH("/users/:id", uc.UpdateUsersRole)
-//UpdateUsersLastname updates the user's lastname field
+//UpdateUsersBio updates the user's lastname field
 func (uc UserController) UpdateUsersBio(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//read the request message and parse the fields
 	decoder := json.NewDecoder(r.Body)

@@ -16,6 +16,7 @@ host/users/:id
 
 ## List of Must Haves (in no particular order)
 
+* Create session package to control dialing to db.
 * CRUD of Blog article resources - Sort of implimented.
 * Serving of static pages: ```About```, ```Contact Us```, ```index```, ```site map```.
 * Need to use cookies, properly by warning users and have them opt in, but off by default.
