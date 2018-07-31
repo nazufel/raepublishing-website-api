@@ -179,7 +179,10 @@ func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Req
 
 	// get ObjectId
 	oid := bson.ObjectIdHex(id)
+	sid := bson.ObjectId(id).String()
 
+	//TODO: use this sid to redirect, holding for now
+	_ = sid
 	//MongoDB query, build the changes
 	change := mgo.Change{
 		// Now to need to loop through users scruct
