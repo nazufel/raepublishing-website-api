@@ -19,14 +19,14 @@ type Users struct {
 	// Undid "omitempty" since the mgo.Change's Change{} already impliments omitempty
 	// ObjectId uses mongo's id service to assign a user id
 	ID        bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	FirstName string        `json:"firstname" bson:"firstname"`
-	LastName  string        `json:"lastname" bson:"lastname"`
-	Username  string        `json:"username" bson:"username"`
-	Email     string        `json:"email" bson:"email"`
-	Role      string        `json:"role" bson:"role"`
-	Created   time.Time     `json:"created" bson:"created"`
-	Updated   time.Time     `json:"updated" bson:"updated"`
-	Bio       string        `json:"bio" bson:"bio"`
+	FirstName string        `json:"firstname,omitempty" bson:"firstname,omitempty"`
+	LastName  string        `json:"lastname,omitempty" bson:"lastname,omitempty"`
+	Username  string        `json:"username,omitempty" bson:"username,omitempty"`
+	Email     string        `json:"email,omitempty" bson:"email,omitempty"`
+	Role      string        `json:"role,omitempty" bson:"role,omitempty"`
+	Created   time.Time     `json:"created,omitempty" bson:"created,omitempty"`
+	Updated   time.Time     `json:"updated,omitempty" bson:"updated,omitempty"`
+	Bio       string        `json:"bio,omitempty" bson:"bio,omitempty"`
 }
 
 /*

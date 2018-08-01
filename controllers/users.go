@@ -51,46 +51,14 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 	// Populate the user data
 	json.NewDecoder(r.Body).Decode(&us)
 
+	//Set user created time
+	us.Created = time.Now().Local()
+
+	//Set user updated time
+	us.Updated = time.Now().Local()
+
 	// Write the user to mongo
 	col.Insert(us)
-
-	//Write a Created time
-	createdTime := mgo.Change{
-		// Now to need to loop through users scruct
-		Update:    bson.M{"$set": bson.M{"created": time.Now()}},
-		Upsert:    false,
-		Remove:    false,
-		ReturnNew: true,
-	}
-	// store updated document in result variable
-	var createdResult bson.M
-
-	// apply the changes to the document
-	_, err := col.Find(bson.M{"_id": us.ID}).Apply(createdTime, &createdResult)
-	if err != nil {
-		fmt.Println(err)
-		//w.WriteHeader(http.StatusNotFound) //404
-		return
-	}
-
-	//Write the updated time
-	updatedTime := mgo.Change{
-		// Now to need to loop through users scruct
-		Update:    bson.M{"$set": bson.M{"updated": time.Now()}},
-		Upsert:    false,
-		Remove:    false,
-		ReturnNew: true,
-	}
-	// store updated document in result variable
-	var updatedResult bson.M
-
-	// apply the changes to the document
-	_, err = col.Find(bson.M{"_id": us.ID}).Apply(updatedTime, &updatedResult)
-	if err != nil {
-		fmt.Println(err)
-		//w.WriteHeader(http.StatusNotFound) //404
-		return
-	}
 
 	// Write content-type and return statuscode and original payload
 	w.Header().Set("Content-Type", "application/json")
@@ -161,6 +129,90 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	json.NewEncoder(w).Encode(models.Users{})
 	fmt.Fprintf(w, "%s\n", uj)
 }
+
+//TODO: set up goroutines in the UpdateUser method that use the below methods to update different fields of the user resource.
+//+This will expose only one endpoint for updating the entire structure. Something like:
+/*
+```
+if r.Body.Firstname != nil {
+	go UpdateUserFirstname(r)
+}
+if r.Body.Lastname != nil {
+	go UpdateUserLastname(r)
+}
+...
+```
+*/
+/*
+//CreateUser Controller for creating a new user
+func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//TODO: verify username and email are unique
+	// shorten db string
+	col := uc.session.DB("go_rest_tutorial").C("users")
+	// Stub a user to be populated from the body
+	us := models.Users{}
+	// Grab id
+	id := p.ByName("id")
+
+	// Verify id is ObjectId hex representation, otherwise return status not found
+	if !bson.IsObjectIdHex(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
+		return
+	}
+
+	// ObjectIdHex returns an ObjectId from the provided hex representation.
+	oid := bson.ObjectIdHex(id)
+
+	// Populate the user data
+	json.NewDecoder(r.Body).Decode(&us)
+
+	// Write the user to mongo
+	col.Insert(us)
+
+	//Write a Created time
+	createdTime := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"created": time.Now()}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var createdResult bson.M
+
+	// apply the changes to the document
+	_, err := col.Find(bson.M{"_id": us.ID}).Apply(createdTime, &createdResult)
+	if err != nil {
+		fmt.Println(err)
+		//w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	//Write the updated time
+	updatedTime := mgo.Change{
+		// Now to need to loop through users scruct
+		Update:    bson.M{"$set": bson.M{"updated": time.Now()}},
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	// store updated document in result variable
+	var updatedResult bson.M
+
+	// apply the changes to the document
+	_, err = col.Find(bson.M{"_id": us.ID}).Apply(updatedTime, &updatedResult)
+	if err != nil {
+		fmt.Println(err)
+		//w.WriteHeader(http.StatusNotFound) //404
+		return
+	}
+
+	// Write content-type and return statuscode and original payload
+	w.Header().Set("Content-Type", "application/json")
+	//http.Redirect(w, r, path+sid, http.StatusMovedPermanently) //302
+	w.WriteHeader(http.StatusCreated) //201
+}
+*/
 
 //UpdateUsersFirstname controller to update user document fields
 func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
