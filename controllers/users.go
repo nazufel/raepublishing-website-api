@@ -25,6 +25,9 @@ func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }
 
+//Path for url redirects
+var path = "http://localhost:3000/api/v1"
+
 // ############# //
 // CRUD HANDLERS //
 // ############# //
@@ -39,11 +42,14 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 	// Stub a user to be populated from the body
 	us := models.Users{}
 
-	// Populate the user data
-	json.NewDecoder(r.Body).Decode(&us)
-
 	// Add an Id
 	us.ID = bson.NewObjectId()
+
+	// Convert Hex Object Id into string for redrect
+	//sid := bson.ObjectId(us.ID).String()
+
+	// Populate the user data
+	json.NewDecoder(r.Body).Decode(&us)
 
 	// Write the user to mongo
 	col.Insert(us)
@@ -88,8 +94,8 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 
 	// Write content-type and return statuscode and original payload
 	w.Header().Set("Content-Type", "application/json")
+	//http.Redirect(w, r, path+sid, http.StatusMovedPermanently) //302
 	w.WriteHeader(http.StatusCreated) //201
-	//TODO: set up http redirect
 }
 
 // READ: GET //
@@ -179,10 +185,9 @@ func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Req
 
 	// get ObjectId
 	oid := bson.ObjectIdHex(id)
-	sid := bson.ObjectId(id).String()
+	// set ObjectId as a string for url redirect
+	//sid := bson.ObjectId(id).String()
 
-	//TODO: use this sid to redirect, holding for now
-	_ = sid
 	//MongoDB query, build the changes
 	change := mgo.Change{
 		// Now to need to loop through users scruct

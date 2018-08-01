@@ -18,7 +18,7 @@ type Users struct {
 	// Users represents the structure of the resource, using bson to store in mongo
 	// Undid "omitempty" since the mgo.Change's Change{} already impliments omitempty
 	// ObjectId uses mongo's id service to assign a user id
-	ID        bson.ObjectId `json:"id" bson:"_id"`
+	ID        bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	FirstName string        `json:"firstname" bson:"firstname"`
 	LastName  string        `json:"lastname" bson:"lastname"`
 	Username  string        `json:"username" bson:"username"`
