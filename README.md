@@ -34,3 +34,4 @@ host/users/:id
 * Separate routes from ```main.go```.
 * Unit Tests: Handler and routes
 * Documentation such as [Swagger](https://github.com/go-swagger/go-swagger)
+* Handle time. Probably write to DB in UTC, but allow the front end to look up user timezone and adjust UTC to local time when presenting. Will have to think about how to handle global times.

@@ -42,14 +42,14 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 	// Stub a user to be populated from the body
 	us := models.Users{}
 
-	// Add an Id
-	us.ID = bson.NewObjectId()
-
 	// Convert Hex Object Id into string for redrect
 	//sid := bson.ObjectId(us.ID).String()
 
 	// Populate the user data
 	json.NewDecoder(r.Body).Decode(&us)
+
+	// Get ObjectID from DB and assign to user
+	us.ID = bson.NewObjectId()
 
 	//Set user created time
 	us.Created = time.Now().Local()
@@ -143,7 +143,6 @@ if r.Body.Lastname != nil {
 ...
 ```
 */
-/*
 //CreateUser Controller for creating a new user
 func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//TODO: verify username and email are unique
@@ -151,6 +150,13 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	col := uc.session.DB("go_rest_tutorial").C("users")
 	// Stub a user to be populated from the body
 	us := models.Users{}
+
+	// Setup Decoder
+	json.NewDecoder(r.Body).Decode(&us)
+
+	// need to send a json array and parse the fields
+	//json.Unmarshal(r.Body, v)
+
 	// Grab id
 	id := p.ByName("id")
 
@@ -160,59 +166,19 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 		return
 	}
 
-	// ObjectIdHex returns an ObjectId from the provided hex representation.
-	oid := bson.ObjectIdHex(id)
+	//Set user updated time
+	us.Updated = time.Now().Local()
 
-	// Populate the user data
-	json.NewDecoder(r.Body).Decode(&us)
+	// Write updates to DB
+	col.Update(id, us)
 
-	// Write the user to mongo
-	col.Insert(us)
-
-	//Write a Created time
-	createdTime := mgo.Change{
-		// Now to need to loop through users scruct
-		Update:    bson.M{"$set": bson.M{"created": time.Now()}},
-		Upsert:    false,
-		Remove:    false,
-		ReturnNew: true,
-	}
-	// store updated document in result variable
-	var createdResult bson.M
-
-	// apply the changes to the document
-	_, err := col.Find(bson.M{"_id": us.ID}).Apply(createdTime, &createdResult)
-	if err != nil {
-		fmt.Println(err)
-		//w.WriteHeader(http.StatusNotFound) //404
-		return
-	}
-
-	//Write the updated time
-	updatedTime := mgo.Change{
-		// Now to need to loop through users scruct
-		Update:    bson.M{"$set": bson.M{"updated": time.Now()}},
-		Upsert:    false,
-		Remove:    false,
-		ReturnNew: true,
-	}
-	// store updated document in result variable
-	var updatedResult bson.M
-
-	// apply the changes to the document
-	_, err = col.Find(bson.M{"_id": us.ID}).Apply(updatedTime, &updatedResult)
-	if err != nil {
-		fmt.Println(err)
-		//w.WriteHeader(http.StatusNotFound) //404
-		return
-	}
+	uj, _ := json.Marshal(us)
 
 	// Write content-type and return statuscode and original payload
 	w.Header().Set("Content-Type", "application/json")
-	//http.Redirect(w, r, path+sid, http.StatusMovedPermanently) //302
-	w.WriteHeader(http.StatusCreated) //201
+	w.WriteHeader(http.StatusAccepted) //202
+	fmt.Fprintf(w, "%s", uj)
 }
-*/
 
 //UpdateUsersFirstname controller to update user document fields
 func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
