@@ -145,19 +145,15 @@ if r.Body.Lastname != nil {
 */
 //CreateUser Controller for creating a new user
 func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	//TODO: verify username and email are unique
 	// shorten db string
 	col := uc.session.DB("go_rest_tutorial").C("users")
-	// Stub a user to be populated from the body
+	// Init user model - probably could be pulled out as a global package variable.
 	us := models.Users{}
 
-	// Setup Decoder
+	// Setup Decoder and decode HTTP request body into User struct
 	json.NewDecoder(r.Body).Decode(&us)
 
-	// need to send a json array and parse the fields
-	//json.Unmarshal(r.Body, v)
-
-	// Grab id
+	// Grab id from the router
 	id := p.ByName("id")
 
 	// Verify id is ObjectId hex representation, otherwise return status not found
@@ -165,6 +161,9 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 		w.WriteHeader(http.StatusNotFound) // 404
 		return
 	}
+
+	// Convert id to ObjectId for update query
+	//oid := bson.ObjectId(id)
 
 	//Set user updated time
 	us.Updated = time.Now().Local()
