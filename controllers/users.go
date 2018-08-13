@@ -27,9 +27,6 @@ func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }
 
-//Path for url redirects
-var path = "http://localhost:3000/api/v1"
-
 // ############# //
 // CRUD HANDLERS //
 // ############# //
@@ -132,20 +129,7 @@ func (uc UserController) GetAllUsers(w http.ResponseWriter, r *http.Request, p h
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
-//TODO: set up goroutines in the UpdateUser method that use the below methods to update different fields of the user resource.
-//+This will expose only one endpoint for updating the entire structure. Something like:
-/*
-```
-if r.Body.Firstname != nil {
-	go UpdateUserFirstname(r)
-}
-if r.Body.Lastname != nil {
-	go UpdateUserLastname(r)
-}
-...
-```
-*/
-//CreateUser Controller for creating a new user
+//UpdateUser Controller for updating user document
 func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// shorten db string
 	col := uc.session.DB("go_rest_tutorial").C("users")
@@ -172,8 +156,7 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	us.Updated = time.Now().Local()
 
 	// Write updates to DB
-	//col.Update(oid, us)
-	col.Update(bson.M{"_id": oid}, bson.M{"$set": bson.M{"firstname": us.FirstName, "lastname": us.LastName, "username": us.Username}})
+	col.Update(bson.M{"_id": oid}, bson.M{"$set": bson.M{"firstname": us.FirstName, "lastname": us.LastName, "username": us.Username, "email": us.Email, "role": us.Role, "updated": us.Updated, "bio": us.Bio}})
 
 	uj, _ := json.Marshal(us)
 
