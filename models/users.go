@@ -9,7 +9,6 @@ import (
 /* Not sure if i'm going to even need this with oAuth. Kind of forgot i was going
 +to do that. However, this is good practice for CRUD.
 */
-//TODO: Encrypt user passwords
 //TODO: Add user profile pictures if oAuth doesn't pull them in from Facebook
 //TODO: Add user Bio.
 
@@ -21,7 +20,7 @@ type Users struct {
 	ID        bson.ObjectId `json:"_id" bson:"_id,omitempty"`
 	FirstName string        `json:"firstname,omitempty" bson:"firstname,omitempty"`
 	LastName  string        `json:"lastname,omitempty" bson:"lastname,omitempty"`
-	Username  string        `json:"username,omitempty" bson:"username,omitempty"`
+	Username  string        `json:"username" bson:"username,omitempty"`
 	Email     string        `json:"email,omitempty" bson:"email,omitempty"`
 	Role      string        `json:"role,omitempty" bson:"role,omitempty"`
 	Created   time.Time     `json:"created,omitempty" bson:"created,omitempty"`

@@ -165,13 +165,15 @@ func (uc UserController) UpdateUser(w http.ResponseWriter, r *http.Request, p ht
 	}
 
 	// Convert id to ObjectId for update query
-	//oid := bson.ObjectId(id)
+	oid := bson.ObjectIdHex(id)
+	log.Print(oid)
 
 	//Set user updated time
 	us.Updated = time.Now().Local()
 
 	// Write updates to DB
-	col.Update(id, us)
+	//col.Update(oid, us)
+	col.Update(bson.M{"_id": oid}, bson.M{"$set": bson.M{"firstname": us.FirstName, "lastname": us.LastName, "username": us.Username}})
 
 	uj, _ := json.Marshal(us)
 
@@ -210,16 +212,16 @@ func (uc UserController) UpdateUsersFirstname(w http.ResponseWriter, r *http.Req
 	//MongoDB query, build the changes
 	change := mgo.Change{
 		// Now to need to loop through users scruct
-		Update:    bson.M{"$set": bson.M{"firstname": us.FirstName}},
+		Update:    bson.M{"$set": bson.M{"firstname": us.FirstName, "lastname": us.LastName}},
 		Upsert:    false,
 		Remove:    false,
 		ReturnNew: true,
 	}
 	// store updated document in result variable
-	var result bson.M
+	//	var result bson.M
 
 	// apply the changes to the document(s)
-	_, err = col.Find(bson.M{"_id": oid}).Apply(change, &result)
+	_, err = col.Find(bson.M{"_id": oid}).Apply(change, &us)
 	if err != nil {
 		fmt.Println(err)
 		//w.WriteHeader(http.StatusNotFound) //404

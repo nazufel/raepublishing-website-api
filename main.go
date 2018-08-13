@@ -42,8 +42,9 @@ func main() {
 	r.GET(extension+"/users/", uc.GetAllUsers)
 	// UPDATE
 	r.PATCH(extension+"/users/:id", uc.UpdateUser)
+
+	//r.PATCH(extension+"/users/firstname/:id", uc.UpdateUsersFirstname)
 	/*
-		r.PATCH(extension+"/users/firstname/:id", uc.UpdateUsersFirstname)
 		r.PATCH(extension+"/users/lastname/:id", uc.UpdateUsersLastname)
 		r.PATCH(extension+"/users/username/:id", uc.UpdateUsersUsername)
 		r.PATCH(extension+"/users/email/:id", uc.UpdateUsersEmail)
