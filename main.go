@@ -8,6 +8,7 @@ import (
 	mgo "gopkg.in/mgo.v2"
 )
 
+//comment change
 //TODO: use env to inject db creds and location.
 func getSession() *mgo.Session {
 	// Connect to our local mongo
